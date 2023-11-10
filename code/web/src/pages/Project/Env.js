@@ -1,21 +1,10 @@
-import React, { Component } from 'react';
-import {
-  Table,
-  Form,
-  Input,
-  Button,
-  Modal,
-  Divider,
-  Row,
-  Col,
-  message,
-  Icon,
-  Typography,
-} from 'antd';
-import { connect } from 'dva';
-import router from 'umi/router';
+import React, { Component } from 'react'
+import { Button, Col, Divider, Form, Icon, Input, message, Modal, Row, Table, Typography, } from 'antd'
+import { connect } from 'dva'
+import router from 'umi/router'
+import { request_post } from '@/utils/request_tool'
 
-const { confirm } = Modal;
+const { confirm } = Modal
 
 @connect(({ api, loading }) => ({
   api,
@@ -30,9 +19,9 @@ class Index extends Component {
     visible: false,
     temp_data: {},
     model_title: '',
-  };
+  }
 
-  componentDidMount() {
+  componentDidMount () {
     this.setState(
       {
         params: {
@@ -41,61 +30,48 @@ class Index extends Component {
         },
       },
       () => {
-        this.fetch();
+        this.fetch()
       }
-    );
+    )
     message.config({
       top: 100,
       duration: 2,
       maxCount: 3,
-    });
+    })
   }
 
-  fetch() {
-    const { dispatch } = this.props;
+  fetch () {
+    const { dispatch } = this.props
     dispatch({
       type: 'api/getProjectEnvList',
       payload: this.state.params,
-    });
+    })
   }
 
   showConfirm = ids => {
-    const that = this;
+    const that = this
     confirm({
       title: '你确定要删除选中项吗?',
       content: '注意：点击确认，将删除无法恢复',
       okText: '确定',
       cancelText: '取消',
-      onOk() {
-        return new Promise((resolve, reject) => {
-          const { dispatch } = that.props;
-          dispatch({
-            type: 'api/delProjectEnv',
-            payload: { ids: ids },
-          }).then(() => {
-            that.setState(
-              {
-                selectedRowKeys: [],
-              },
-              () => {
-                that.fetch();
-                setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
-              }
-            );
-          });
-        }).catch(() => console.log('Oops errors!'));
+      onOk () {
+
+        request_post('/api/delProjectEnv', { ids }).then(res => {
+          if (res.code === 200) {
+            that.fetch()
+          }
+        })
+
       },
-      onCancel() {
-        //
-      },
-    });
-  };
+    })
+  }
 
   onSelectChange = selectedRowKeys => {
-    this.setState({ selectedRowKeys });
-  };
+    this.setState({ selectedRowKeys })
+  }
 
-  render() {
+  render () {
     const columns = [
       {
         title: 'Id',
@@ -132,34 +108,34 @@ class Index extends Component {
           <span>
             <a
               onClick={() => {
-                router.push(`/project/env/${record.id}/config`);
+                router.push(`/project/env/${record.id}/config`)
               }}
             >
               配置管理
             </a>
-            <Divider type="vertical" />
+            <Divider type="vertical"/>
             <a
               onClick={() => {
-                router.push(`/project/env/${record.id}/webhook`);
+                router.push(`/project/env/${record.id}/webhook`)
               }}
             >
               webhook
             </a>
-            <Divider type="vertical" />
+            <Divider type="vertical"/>
             <a
               onClick={() => {
-                const { dispatch } = this.props;
+                const { dispatch } = this.props
                 dispatch({
                   type: 'api/copyProjectEnv',
                   payload: { project_env_id: record.id },
                 }).then(() => {
-                  this.fetch();
-                });
+                  this.fetch()
+                })
               }}
             >
               备份
             </a>
-            <Divider type="vertical" />
+            <Divider type="vertical"/>
             <a
               onClick={() => {
                 this.setState({
@@ -170,16 +146,16 @@ class Index extends Component {
                     code: record.code,
                     desc: record.desc,
                   },
-                });
+                })
               }}
             >
               编辑
             </a>
-            <Divider type="vertical" />
+            <Divider type="vertical"/>
             <a
               style={{ color: 'red' }}
               onClick={() => {
-                this.showConfirm([record.id]);
+                this.showConfirm([record.id])
               }}
             >
               删除
@@ -187,21 +163,21 @@ class Index extends Component {
           </span>
         ),
       },
-    ];
+    ]
 
-    const { _loading, api } = this.props;
+    const { _loading, api } = this.props
 
-    const { selectedRowKeys } = this.state;
+    const { selectedRowKeys } = this.state
 
     return (
       <div>
         <div style={{ padding: '20px' }}>
           <a
             onClick={() => {
-              router.goBack();
+              router.goBack()
             }}
           >
-            <Icon theme="twoTone" type="left-circle" />&nbsp;
+            <Icon theme="twoTone" type="left-circle"/>&nbsp;
             返回
           </a>
         </div>
@@ -224,7 +200,7 @@ class Index extends Component {
                       visible: true,
                       model_title: '新增环境',
                       temp_data: {},
-                    });
+                    })
                   }}
                 >
                   新增
@@ -235,54 +211,39 @@ class Index extends Component {
                   confirmLoading={this.state.confirmLoading || false}
                   okText="保存"
                   onOk={() => {
-                    let { temp_data } = this.state;
-                    if (!temp_data.code || !temp_data.desc) {
-                      message.warning('必填项不能为空');
-                      return;
+
+                    let { temp_data } = this.state
+                    temp_data.project_id = this.state.params.project_id
+                    let url = '/api/addProjectEnv'
+                    if (temp_data.id) {
+                      url = '/api/editProjectEnv'
                     }
-                    const { dispatch } = this.props;
-                    this.setState(
-                      {
-                        confirmLoading: true,
-                      },
-                      () => {
-                        let type = 'api/addProjectEnv';
-                        if (temp_data.id) {
-                          type = 'api/editProjectEnv';
-                        }
-                        temp_data.project_id = this.state.params.project_id;
-                        dispatch({
-                          type,
-                          payload: temp_data,
-                        }).then(() => {
-                          this.setState(
-                            {
-                              visible: false,
-                              confirmLoading: false,
-                            },
-                            () => {
-                              this.fetch();
-                            }
-                          );
-                        });
+                    this.setState({ confirmLoading: true, })
+                    request_post(url, temp_data).then(res => {
+                      this.setState({ confirmLoading: false, })
+                      if (res.code === 200) {
+                        this.setState({ visible: false, }, () => {
+                          this.fetch()
+                        })
                       }
-                    );
+                    })
+
                   }}
                   onCancel={() => {
                     this.setState({
                       visible: false,
                       confirmLoading: false,
-                    });
+                    })
                   }}
                 >
                   <Form
                     labelCol={{
-                      xs: {span: 24},
-                      sm: {span: 4},
+                      xs: { span: 24 },
+                      sm: { span: 4 },
                     }}
                     wrapperCol={{
-                      xs: {span: 24},
-                      sm: {span: 20},
+                      xs: { span: 24 },
+                      sm: { span: 20 },
                     }}
                   >
                     <Form.Item required label="环境码">
@@ -293,7 +254,7 @@ class Index extends Component {
                               ...this.state.temp_data,
                               code: e.target.value,
                             },
-                          });
+                          })
                         }}
                         name="code"
                         placeholder="请输入环境码"
@@ -310,7 +271,7 @@ class Index extends Component {
                               ...this.state.temp_data,
                               desc: e.target.value,
                             },
-                          });
+                          })
                         }}
                         name="desc"
                         placeholder="请输入环境简介"
@@ -324,11 +285,11 @@ class Index extends Component {
                   type="danger"
                   onClick={e => {
                     if (selectedRowKeys.length === 0) {
-                      message.warning('请选择需要删除的项');
+                      message.warning('请选择需要删除的项')
                     } else {
-                      this.showConfirm(selectedRowKeys);
+                      this.showConfirm(selectedRowKeys)
                     }
-                    e.stopPropagation();
+                    e.stopPropagation()
                   }}
                 >
                   删除选中
@@ -352,8 +313,8 @@ class Index extends Component {
           />
         </div>
       </div>
-    );
+    )
   }
 }
 
-export default Index;
+export default Index

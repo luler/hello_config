@@ -8,6 +8,7 @@
 // +----------------------------------------------------------------------
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
+use think\facade\Route;
 
 Route::group('api', function () {
     Route::get('casLogin', 'home/Login/casLogin');

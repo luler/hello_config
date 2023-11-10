@@ -1,27 +1,15 @@
-import React, { Component } from 'react';
-import {
-  Table,
-  Form,
-  Input,
-  Button,
-  Modal,
-  Divider,
-  Row,
-  Col,
-  message,
-  Icon,
-  Typography,
-  Tabs,
-  Spin,
-} from 'antd';
-import { connect } from 'dva';
-import router from 'umi/router';
-import { UnControlled as CodeMirror } from 'react-codemirror2';
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/theme/material.css';
-import 'codemirror/mode/properties/properties';
+import React, { Component } from 'react'
+import { Button, Col, Divider, Form, Icon, Input, message, Modal, Row, Spin, Table, Tabs, Typography, } from 'antd'
+import { connect } from 'dva'
+import router from 'umi/router'
+import { UnControlled as CodeMirror } from 'react-codemirror2'
+import 'codemirror/lib/codemirror.css'
+import 'codemirror/theme/material.css'
+import 'codemirror/mode/properties/properties'
+import styles from './codemirror.less'
+import { request_post } from '@/utils/request_tool'
 
-const { confirm } = Modal;
+const { confirm } = Modal
 
 @connect(({ api, loading }) => ({
   api,
@@ -39,9 +27,9 @@ class Index extends Component {
     text: '',
     temp_text: false,
     webhooking: false,
-  };
+  }
 
-  componentDidMount() {
+  componentDidMount () {
     this.setState(
       {
         params: {
@@ -50,66 +38,56 @@ class Index extends Component {
         },
       },
       () => {
-        this.fetch();
+        this.fetch()
       }
-    );
+    )
     message.config({
       top: 100,
       duration: 2,
       maxCount: 3,
-    });
+    })
   }
 
-  fetch() {
-    const { dispatch } = this.props;
+  fetch () {
+    const { dispatch } = this.props
     dispatch({
       type: 'api/getProjectEnvConfigList',
       payload: this.state.params,
     }).then(() => {
-      const { api } = this.props;
+      const { api } = this.props
       this.setState({
         text: api.putProjectEnvConfigList.text,
-      });
-    });
+      })
+    })
   }
 
   showConfirm = ids => {
-    const that = this;
+    const that = this
     confirm({
       title: '你确定要删除选中项吗?',
       content: '注意：点击确认，将删除无法恢复',
       okText: '确定',
       cancelText: '取消',
-      onOk() {
-        return new Promise((resolve, reject) => {
-          const { dispatch } = that.props;
-          dispatch({
-            type: 'api/delProjectEnvConfig',
-            payload: { ids },
-          }).then(() => {
-            that.setState(
-              {
-                selectedRowKeys: [],
-              },
-              () => {
-                that.fetch();
-                setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
-              }
-            );
-          });
-        }).catch(() => console.log('Oops errors!'));
+      onOk () {
+
+        request_post('/api/delProjectEnvConfig', { ids }).then(res => {
+          if (res.code === 200) {
+            that.fetch()
+          }
+        })
+
       },
-      onCancel() {
+      onCancel () {
         //
       },
-    });
-  };
+    })
+  }
 
   onSelectChange = selectedRowKeys => {
-    this.setState({ selectedRowKeys });
-  };
+    this.setState({ selectedRowKeys })
+  }
 
-  render() {
+  render () {
     const columns = [
       {
         title: 'Id',
@@ -161,16 +139,16 @@ class Index extends Component {
                     value: record.value,
                     desc: record.desc,
                   },
-                });
+                })
               }}
             >
               编辑
             </a>
-            <Divider type="vertical" />
+            <Divider type="vertical"/>
             <a
               style={{ color: 'red' }}
               onClick={() => {
-                this.showConfirm([record.id]);
+                this.showConfirm([record.id])
               }}
             >
               删除
@@ -178,11 +156,11 @@ class Index extends Component {
           </span>
         ),
       },
-    ];
+    ]
 
-    const { _loading, api } = this.props;
+    const { _loading, api } = this.props
 
-    const { selectedRowKeys } = this.state;
+    const { selectedRowKeys } = this.state
 
     return (
       <Spin
@@ -194,10 +172,10 @@ class Index extends Component {
           <div style={{ padding: '20px' }}>
             <a
               onClick={() => {
-                router.goBack();
+                router.goBack()
               }}
             >
-              <Icon theme="twoTone" type="left-circle" />&nbsp;
+              <Icon theme="twoTone" type="left-circle"/>&nbsp;
               返回
             </a>
           </div>
@@ -214,7 +192,7 @@ class Index extends Component {
               <Tabs.TabPane
                 tab={
                   <span>
-                    <Icon type="table" />
+                    <Icon type="table"/>
                     表格
                   </span>
                 }
@@ -230,7 +208,7 @@ class Index extends Component {
                             visible: true,
                             model_title: '新增配置',
                             temp_data: {},
-                          });
+                          })
                         }}
                       >
                         新增
@@ -241,56 +219,36 @@ class Index extends Component {
                         confirmLoading={this.state.confirmLoading || false}
                         okText="保存"
                         onOk={() => {
-                          let { temp_data } = this.state;
-                          if (!temp_data.key) {
-                            message.warning('必填项不能为空');
-                            return;
+
+                          let { temp_data } = this.state
+                          let url = '/api/addProjectEnvConfig'
+                          if (temp_data.id) {
+                            url = '/api/editProjectEnvConfig'
                           }
-                          const { dispatch } = this.props;
-                          this.setState(
-                            {
-                              confirmLoading: true,
-                              webhooking: true,
-                            },
-                            () => {
-                              let type = 'api/addProjectEnvConfig';
-                              if (temp_data.id) {
-                                type = 'api/editProjectEnvConfig';
-                              }
-                              temp_data.project_env_id = this.state.params.project_env_id;
-                              dispatch({
-                                type,
-                                payload: temp_data,
-                              }).then(() => {
-                                this.setState(
-                                  {
-                                    visible: false,
-                                    confirmLoading: false,
-                                    webhooking: false,
-                                  },
-                                  () => {
-                                    this.fetch();
-                                  }
-                                );
-                              });
+                          temp_data.project_env_id = this.state.params.project_env_id
+                          this.setState({ confirmLoading: true, webhooking: true, })
+                          request_post(url, temp_data).then(res => {
+                            this.setState({ confirmLoading: false })
+                            if (res.code === 200) {
+                              this.setState({ visible: false, webhooking: false, }, () => {
+                                this.fetch()
+                              })
                             }
-                          );
+                          })
+
                         }}
                         onCancel={() => {
-                          this.setState({
-                            visible: false,
-                            confirmLoading: false,
-                          });
+                          this.setState({ visible: false, })
                         }}
                       >
                         <Form
                           labelCol={{
-                            xs: {span: 24},
-                            sm: {span: 4},
+                            xs: { span: 24 },
+                            sm: { span: 4 },
                           }}
                           wrapperCol={{
-                            xs: {span: 24},
-                            sm: {span: 20},
+                            xs: { span: 24 },
+                            sm: { span: 20 },
                           }}
                         >
                           <Form.Item required label="key">
@@ -301,7 +259,7 @@ class Index extends Component {
                                     ...this.state.temp_data,
                                     key: e.target.value,
                                   },
-                                });
+                                })
                               }}
                               name="key"
                               disabled={Boolean(this.state.temp_data.id) || false}
@@ -319,7 +277,7 @@ class Index extends Component {
                                     ...this.state.temp_data,
                                     value: e.target.value,
                                   },
-                                });
+                                })
                               }}
                               name="desc"
                               placeholder="请输入键值"
@@ -336,7 +294,7 @@ class Index extends Component {
                                     ...this.state.temp_data,
                                     desc: e.target.value,
                                   },
-                                });
+                                })
                               }}
                               name="desc"
                               placeholder="请输入备注"
@@ -350,11 +308,11 @@ class Index extends Component {
                         type="danger"
                         onClick={e => {
                           if (selectedRowKeys.length === 0) {
-                            message.warning('请选择需要删除的项目');
+                            message.warning('请选择需要删除的项目')
                           } else {
-                            this.showConfirm(selectedRowKeys);
+                            this.showConfirm(selectedRowKeys)
                           }
-                          e.stopPropagation();
+                          e.stopPropagation()
                         }}
                       >
                         删除选中
@@ -381,13 +339,14 @@ class Index extends Component {
               <Tabs.TabPane
                 tab={
                   <span>
-                    <Icon type="book" />
+                    <Icon type="book"/>
                     文本
                   </span>
                 }
                 key="2"
               >
                 <CodeMirror
+                  className={styles.MyCodeMirror}
                   value={this.state.text}
                   options={{
                     mode: 'properties',
@@ -397,7 +356,7 @@ class Index extends Component {
                   onChange={(editor, data, value) => {
                     this.setState({
                       temp_text: value,
-                    });
+                    })
                   }}
                 />
 
@@ -405,26 +364,22 @@ class Index extends Component {
                   style={{ marginTop: '20px' }}
                   type="primary"
                   onClick={() => {
+
                     if (this.state.temp_text === false) {
-                      message.warning('配置文本暂无修改');
-                      return;
+                      message.warning('配置文本暂无修改')
+                      return
                     }
-                    this.setState({
-                      webhooking: true,
-                    });
-                    const { dispatch } = this.props;
-                    dispatch({
-                      type: 'api/editProjectEnvConfigV2',
-                      payload: {
-                        project_env_id: this.state.params.project_env_id,
-                        text: this.state.temp_text,
-                      },
-                    }).then(() => {
-                      this.setState({
-                        webhooking: false,
-                      });
-                      this.fetch();
-                    });
+                    this.setState({ webhooking: true, })
+                    request_post('/api/editProjectEnvConfigV2', {
+                      project_env_id: this.state.params.project_env_id,
+                      text: this.state.temp_text,
+                    }).then(res => {
+                      if (res.code === 200) {
+                        this.setState({ webhooking: false, })
+                        this.fetch()
+                      }
+                    })
+
                   }}
                 >
                   保存
@@ -434,8 +389,8 @@ class Index extends Component {
           </div>
         </div>
       </Spin>
-    );
+    )
   }
 }
 
-export default Index;
+export default Index

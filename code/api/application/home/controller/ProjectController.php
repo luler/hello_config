@@ -56,7 +56,7 @@ class ProjectController extends BaseController
 
         checkData($param, [
             'title|项目名称' => 'require',
-            'desc|项目描述' => 'require|max:255',
+            'desc|项目简介' => 'require|max:255',
         ]);
 
         $param['code'] = uniqid();
@@ -80,7 +80,7 @@ class ProjectController extends BaseController
         checkData($param, [
             'id|项目' => 'require|integer',
             'title|项目名称' => 'require',
-            'desc|项目描述' => 'require|max:255',
+            'desc|项目简介' => 'require|max:255',
         ]);
 
         if (!User::isSuperAdmin()) {

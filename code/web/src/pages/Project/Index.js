@@ -192,41 +192,23 @@ class Index extends Component {
             confirmLoading={this.state.confirmLoading || false}
             okText="保存"
             onOk={() => {
-              let {temp_data} = this.state;
-              if (!temp_data.title || !temp_data.desc) {
-                message.warning('必填项不能为空');
-                return;
+              let url = '/api/addProject';
+              if (this.state.temp_data.id) {
+                url = '/api/editProject';
               }
-              const {dispatch} = this.props;
-              this.setState(
-                {
-                  confirmLoading: true,
-                },
-                () => {
-                  let type = 'api/addProject';
-                  if (temp_data.id) {
-                    type = 'api/editProject';
-                  }
-                  dispatch({
-                    type,
-                    payload: temp_data,
-                  }).then(() => {
-                    this.setState(
-                      {
-                        visible: false,
-                        confirmLoading: false,
-                        params: {
-                          ...this.state.params,
-                          page: 1,
-                        },
-                      },
-                      () => {
-                        this.fetch(this.state.params);
-                      }
-                    );
+              this.setState({confirmLoading: true,})
+              request_post(url, this.state.temp_data).then(res => {
+                this.setState({confirmLoading: false,})
+                if (res.code === 200) {
+                  this.setState({
+                    visible: false,
+                    params: {...this.state.params, page: 1,},
+                  }, () => {
+                    this.fetch(this.state.params);
                   });
                 }
-              );
+              })
+
             }}
             onCancel={() => {
               this.setState({

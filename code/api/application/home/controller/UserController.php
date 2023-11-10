@@ -91,6 +91,12 @@ class UserController extends BaseController
             'is_admin|用户类型' => 'in:0,1',
             'is_use|状态' => 'in:0,1',
         ]);
+        if (isset($param['title'])) {
+            checkData($param, [
+                'title|用户名称' => 'require',
+                'is_admin|用户类型' => 'require',
+            ]);
+        }
 
         if (!empty($param['appsecret'])) {
             $param['appsecret'] = User::translatePassword($param['appsecret']);
