@@ -353,7 +353,16 @@ class User extends Component {
             });
           }}
         >
-          <Form>
+          <Form
+            labelCol={{
+              xs: {span: 24},
+              sm: {span: 4},
+            }}
+            wrapperCol={{
+              xs: {span: 24},
+              sm: {span: 20},
+            }}
+          >
             <Form.Item required label="用户名称">
               <Input
                 onInput={this.onEditFormFieldChange}
@@ -411,7 +420,16 @@ class User extends Component {
               });
             }}
           >
-            <Form>
+            <Form
+              labelCol={{
+                xs: {span: 24},
+                sm: {span: 4},
+              }}
+              wrapperCol={{
+                xs: {span: 24},
+                sm: {span: 20},
+              }}
+            >
               <Form.Item required label="用户名称">
                 <Input
                   onInput={this.onFormFieldChange}

@@ -206,7 +206,7 @@ class Index extends Component {
                 router.goBack();
               }}
             >
-              <Icon theme="twoTone" type="left-circle" />
+              <Icon theme="twoTone" type="left-circle" />&nbsp;
               返回
             </a>
           </div>
@@ -280,7 +280,16 @@ class Index extends Component {
                       });
                     }}
                   >
-                    <Form>
+                    <Form
+                      labelCol={{
+                        xs: {span: 24},
+                        sm: {span: 4},
+                      }}
+                      wrapperCol={{
+                        xs: {span: 24},
+                        sm: {span: 20},
+                      }}
+                    >
                       <Form.Item required label="回调地址">
                         <Input
                           onInput={e => {

@@ -80,12 +80,12 @@ export default {
   },
   proxy: {
     '/api/': {
-      target: 'http://175.178.153.77:20003/',
+      target: 'http://127.0.0.1:1995/',
       changeOrigin: true,
       pathRewrite: { '^/': '' },
     },
     '/backend/': {
-      target: 'http://175.178.153.77:20003/',
+      target: 'http://127.0.0.1:1995/',
       changeOrigin: true,
       pathRewrite: { '^/': '' },
     },

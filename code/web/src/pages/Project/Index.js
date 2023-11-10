@@ -1,11 +1,12 @@
-import React, { Component } from 'react';
-import { Table, Form, Input, Button, Modal, Divider, Row, Col, message } from 'antd';
-import { connect } from 'dva';
+import React, {Component} from 'react';
+import {Button, Divider, Form, Input, message, Modal, Table} from 'antd';
+import {connect} from 'dva';
 import router from 'umi/router';
+import {request_post} from "@/utils/request_tool";
 
-const { confirm } = Modal;
+const {confirm} = Modal;
 
-@connect(({ api, loading }) => ({
+@connect(({api, loading}) => ({
   api,
   _loading: loading.effects['api/getProjectList'],
 }))
@@ -47,7 +48,7 @@ class Index extends Component {
   };
 
   fetch(params) {
-    const { dispatch } = this.props;
+    const {dispatch} = this.props;
     dispatch({
       type: 'api/getProjectList',
       payload: params,
@@ -62,27 +63,11 @@ class Index extends Component {
       okText: '确定',
       cancelText: '取消',
       onOk() {
-        return new Promise((resolve, reject) => {
-          const { dispatch } = that.props;
-          dispatch({
-            type: 'api/delProject',
-            payload: { ids: ids },
-          }).then(() => {
-            that.setState(
-              {
-                params: {
-                  ...that.state.params,
-                  page: 1,
-                },
-                selectedRowKeys: [],
-              },
-              () => {
-                that.fetch(that.state.params);
-                setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
-              }
-            );
-          });
-        }).catch(() => console.log('Oops errors!'));
+        request_post('/api/delProject', {ids}).then(res => {
+          if (res.code === 200) {
+            that.fetch(that.state.params);
+          }
+        })
       },
       onCancel() {
         //
@@ -91,7 +76,7 @@ class Index extends Component {
   };
 
   onSelectChange = selectedRowKeys => {
-    this.setState({ selectedRowKeys });
+    this.setState({selectedRowKeys});
   };
 
   render() {
@@ -145,7 +130,7 @@ class Index extends Component {
             >
               设置环境
             </a>
-            <Divider type="vertical" />
+            <Divider type="vertical"/>
             <a
               onClick={() => {
                 this.setState({
@@ -161,9 +146,9 @@ class Index extends Component {
             >
               编辑
             </a>
-            <Divider type="vertical" />
+            <Divider type="vertical"/>
             <a
-              style={{ color: 'red' }}
+              style={{color: 'red'}}
               onClick={() => {
                 this.showConfirm([record.id]);
               }}
@@ -175,7 +160,7 @@ class Index extends Component {
       },
     ];
 
-    const { _loading, api } = this.props;
+    const {_loading, api} = this.props;
 
     const pagination = {
       current: api.putProjectList.page,
@@ -184,11 +169,11 @@ class Index extends Component {
       showTotal: (total, range) => `总共 ${total} 条数据`,
     };
 
-    const { selectedRowKeys } = this.state;
+    const {selectedRowKeys} = this.state;
 
     return (
-      <div style={{ backgroundColor: 'white', padding: '20px' }}>
-        <div style={{ padding: '20px 0' }}>
+      <div style={{backgroundColor: 'white', padding: '20px'}}>
+        <div style={{padding: '20px 0'}}>
           <Button
             type="primary"
             onClick={() => {
@@ -207,12 +192,12 @@ class Index extends Component {
             confirmLoading={this.state.confirmLoading || false}
             okText="保存"
             onOk={() => {
-              let { temp_data } = this.state;
+              let {temp_data} = this.state;
               if (!temp_data.title || !temp_data.desc) {
                 message.warning('必填项不能为空');
                 return;
               }
-              const { dispatch } = this.props;
+              const {dispatch} = this.props;
               this.setState(
                 {
                   confirmLoading: true,
@@ -250,7 +235,16 @@ class Index extends Component {
               });
             }}
           >
-            <Form>
+            <Form
+              labelCol={{
+                xs: {span: 24},
+                sm: {span: 4},
+              }}
+              wrapperCol={{
+                xs: {span: 24},
+                sm: {span: 20},
+              }}
+            >
               <Form.Item required label="项目名称">
                 <Input
                   onInput={e => {
@@ -310,7 +304,7 @@ class Index extends Component {
           </Button>
           <Input.Search
             allowClear
-            style={{ width: 400, float: 'right' }}
+            style={{width: 400, float: 'right'}}
             placeholder="请输入搜索关键字"
             onSearch={value => {
               this.setState(
