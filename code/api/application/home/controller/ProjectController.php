@@ -59,6 +59,10 @@ class ProjectController extends BaseController
             'desc|项目简介' => 'require|max:255',
         ]);
 
+        if (Project::where('title', $param['title'])->where('creator_uid', is_login())->count()) {
+            throw new CommonException('项目名称已存在');
+        }
+
         $param['code'] = uniqid();
         $param['creator_uid'] = is_login();
         Project::create($param);
@@ -87,6 +91,12 @@ class ProjectController extends BaseController
             if (!Project::where('creator_uid', is_login())->where('id', $param['id'])->count()) {
                 throw new CommonException('无权操作');
             }
+        }
+        if (Project::where('title', $param['title'])
+            ->where('creator_uid', is_login())
+            ->where('id', '<>', $param['id'])
+            ->count()) {
+            throw new CommonException('项目名称已存在');
         }
 
         Project::update($param);
