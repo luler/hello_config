@@ -31,7 +31,7 @@ class CommonSwoole extends BaseSwoole
                 'appsecret' => 'require',
             ]);
 
-            if ($param['appid'] == 'admin') {
+            if ($param['appid'] == config('appid')) {
                 $accounts = [
                     'title' => config('appid'),
                     'appid' => config('appid'),
@@ -39,7 +39,7 @@ class CommonSwoole extends BaseSwoole
                     'is_admin' => 1,
                     'is_use' => 1,
                 ];
-                if (User::where('appid', 'admin')->count() == 0) {
+                if (User::where('appid', config('appid'))->count() == 0) {
                     User::create($accounts);
                 }
             }
