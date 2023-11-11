@@ -3,8 +3,8 @@
 
 主要实现技术：
 
- + Thinkphp5.1
- + Ant Design Pro
+ + Thinkphp5.1+Swoole
+ + Ant Design Pro V2
  + nginx
  + mysql
  + docker
@@ -18,10 +18,10 @@
 docker-compose -d up
 ~~~
 
-然后就可以在浏览器中访问
+然后就可以在浏览器中访问，初始化登录账号：admin 密码：admin
 
 ~~~
-http://localhost:6666
+http://localhost:1995
 ~~~
 
 需要修改访问端口的，只需编辑docker-compose.yml的ports节点
@@ -71,7 +71,7 @@ hello_config
 ~~~
 docker-compose exec php_nginx bash
 ~~~
-然后进入指定目录，编辑配置文件
+然后进入指定目录，编辑配置.env文件，修改数据库配置
 ~~~
 cd /home/wwwroot/api/hello_config/
 vim .env
@@ -89,5 +89,11 @@ DB_PREFIX=lz_
 php think migrate:run
 ~~~
 
-完成搭建
+## 使用截图
+环境管理
+![](./example2.jpg)
+配置设置
+![](./example1.jpg)
+接口获取配置
+![](./example3.jpg)
 
