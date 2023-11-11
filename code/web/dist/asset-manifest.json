@@ -10,6 +10,7 @@
   "/p__Frontend__CasLogin.js": "/p__Frontend__CasLogin.async.js",
   "/p__Project__Config.css": "/p__Project__Config.chunk.css",
   "/p__Project__Config.js": "/p__Project__Config.async.js",
+  "/p__Project__Env.css": "/p__Project__Env.chunk.css",
   "/p__Project__Env.js": "/p__Project__Env.async.js",
   "/p__Project__Index.js": "/p__Project__Index.async.js",
   "/p__Project__Webhook.js": "/p__Project__Webhook.async.js",

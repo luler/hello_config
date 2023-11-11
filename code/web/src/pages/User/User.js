@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
-import { Button, Form, Input, Modal, Select, Switch, Table } from 'antd'
+import { Breadcrumb, Button, Form, Input, Modal, Select, Switch, Table } from 'antd'
 import { connect } from 'dva'
 import { request_post } from '@/utils/request_tool'
+import { Link } from 'umi'
 
 @connect(({ api, loading }) => ({
   api, _loading: loading.effects['api/getUserList'],
@@ -168,117 +169,126 @@ class User extends Component {
       showTotal: (total, range) => `总共 ${total} 条数据`,
     }
 
-    return (<div style={{ backgroundColor: 'white', padding: '20px' }}>
-      <Modal
-        title={!!this.state.data.id ? '编辑用户' : '新增用户'}
-        visible={this.state.visible}
-        onOk={() => {
-          let url = !!this.state.data.id ? '/api/editUser' : '/api/addUser'
-          this.setState({ confirmLoading: true }, () => {
-            request_post(url, this.state.data).then(res => {
-              this.setState({ confirmLoading: false, })
-              if (res.code === 200) {
-                this.setState({ visible: false, })
-                this.fetch(this.state.params)
-              }
-            })
-          })
+    return (
+      <div>
+        <Breadcrumb>
+          <Breadcrumb.Item><Link to="/">首页</Link></Breadcrumb.Item>
+          <Breadcrumb.Item><Link to="/config/user">用户管理</Link></Breadcrumb.Item>
+        </Breadcrumb>
 
-        }}
-        confirmLoading={this.state.confirmLoading || false}
-        okText="保存"
-        onCancel={() => {
-          this.setState({
-            visible: false, confirmLoading: false,
-          })
-        }}
-      >
-        <Form
-          labelCol={{
-            xs: { span: 24 }, sm: { span: 4 },
-          }}
-          wrapperCol={{
-            xs: { span: 24 }, sm: { span: 20 },
-          }}
-        >
-          <Form.Item required label="用户名称">
-            <Input
-              onInput={this.onEditFormFieldChange}
-              name="title"
-              value={this.state.data.title}
-              placeholder="请输入用户名称"
-            />
-          </Form.Item>
+        <div style={{ backgroundColor: 'white', padding: '10px 20px', marginTop: 20 }}>
+          <Modal
+            title={!!this.state.data.id ? '编辑用户' : '新增用户'}
+            visible={this.state.visible}
+            onOk={() => {
+              let url = !!this.state.data.id ? '/api/editUser' : '/api/addUser'
+              this.setState({ confirmLoading: true }, () => {
+                request_post(url, this.state.data).then(res => {
+                  this.setState({ confirmLoading: false, })
+                  if (res.code === 200) {
+                    this.setState({ visible: false, })
+                    this.fetch(this.state.params)
+                  }
+                })
+              })
 
-          <Form.Item required label="appid">
-            <Input
-              onInput={this.onEditFormFieldChange}
-              name="appid"
-              value={this.state.data.appid}
-              placeholder="请输入appid"
-              disabled={!!this.state.data.id}
-            />
-          </Form.Item>
-
-          <Form.Item label="appsecret">
-            <Input.Password
-              onInput={this.onEditFormFieldChange}
-              name="appsecret"
-              value={this.state.data.appsecret}
-              placeholder="请输入appsecret"
-            />
-          </Form.Item>
-
-          <Form.Item required label="用户类型">
-            <Select
-              value={this.state.data.is_admin + ''}
-              onChange={this.onEditFormFieldChange}
+            }}
+            confirmLoading={this.state.confirmLoading || false}
+            okText="保存"
+            onCancel={() => {
+              this.setState({
+                visible: false, confirmLoading: false,
+              })
+            }}
+          >
+            <Form
+              labelCol={{
+                xs: { span: 24 }, sm: { span: 4 },
+              }}
+              wrapperCol={{
+                xs: { span: 24 }, sm: { span: 20 },
+              }}
             >
-              <Select.Option value="0">普通用户</Select.Option>
-              <Select.Option value="1">超级管理员</Select.Option>
-            </Select>
-          </Form.Item>
-        </Form>
-      </Modal>
+              <Form.Item required label="用户名称">
+                <Input
+                  onInput={this.onEditFormFieldChange}
+                  name="title"
+                  value={this.state.data.title}
+                  placeholder="请输入用户名称"
+                />
+              </Form.Item>
 
-      <div style={{ padding: '20px 0' }}>
-        <Button type="primary" onClick={() => {
-          this.setState({
-            visible: true,
-            data: {
-              is_admin: '0',
-            },
-          })
-        }}>
-          新增
-        </Button>
+              <Form.Item required label="appid">
+                <Input
+                  onInput={this.onEditFormFieldChange}
+                  name="appid"
+                  value={this.state.data.appid}
+                  placeholder="请输入appid"
+                  disabled={!!this.state.data.id}
+                />
+              </Form.Item>
 
-        <Input.Search
-          allowClear
-          style={{ width: 400, float: 'right' }}
-          placeholder="请输入搜索关键字"
-          onSearch={value => {
-            this.setState({
-              params: {
-                ...this.state.params, page: 1, search: value,
-              },
-            }, () => {
-              this.fetch(this.state.params)
-            })
-          }}
-        />
+              <Form.Item label="appsecret">
+                <Input.Password
+                  onInput={this.onEditFormFieldChange}
+                  name="appsecret"
+                  value={this.state.data.appsecret}
+                  placeholder="请输入appsecret"
+                />
+              </Form.Item>
+
+              <Form.Item required label="用户类型">
+                <Select
+                  value={this.state.data.is_admin + ''}
+                  onChange={this.onEditFormFieldChange}
+                >
+                  <Select.Option value="0">普通用户</Select.Option>
+                  <Select.Option value="1">超级管理员</Select.Option>
+                </Select>
+              </Form.Item>
+            </Form>
+          </Modal>
+
+          <div style={{ padding: '20px 0' }}>
+            <Button type="primary" onClick={() => {
+              this.setState({
+                visible: true,
+                data: {
+                  is_admin: '0',
+                },
+              })
+            }}>
+              新增
+            </Button>
+
+            <Input.Search
+              allowClear
+              style={{ width: 400, float: 'right' }}
+              placeholder="请输入搜索关键字"
+              onSearch={value => {
+                this.setState({
+                  params: {
+                    ...this.state.params, page: 1, search: value,
+                  },
+                }, () => {
+                  this.fetch(this.state.params)
+                })
+              }}
+            />
+          </div>
+          <Table
+            // style={{tableLayout: 'fixed'}}
+            dataSource={api.getUserList.list}
+            rowKey={record => record.id}
+            pagination={pagination}
+            columns={columns}
+            loading={_loading}
+            // bordered
+            onChange={this.handleTableChange}
+          />
+        </div>
       </div>
-      <Table
-        // style={{tableLayout: 'fixed'}}
-        dataSource={api.getUserList.list}
-        rowKey={record => record.id}
-        pagination={pagination}
-        columns={columns}
-        loading={_loading}
-        // bordered
-        onChange={this.handleTableChange}
-      />
-    </div>)
+    )
   }
 }
 

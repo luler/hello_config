@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
-import { Button, Col, Divider, Form, Icon, Input, message, Modal, Row, Table, Typography, } from 'antd'
+import { Breadcrumb, Button, Col, Divider, Form, Input, message, Modal, Popconfirm, Row, Table, } from 'antd'
 import { connect } from 'dva'
 import router from 'umi/router'
 import { request_post } from '@/utils/request_tool'
+import { Link } from 'umi'
 
 const { confirm } = Modal
 
@@ -108,7 +109,10 @@ class Index extends Component {
           <span>
             <a
               onClick={() => {
-                router.push(`/project/env/${record.id}/config`)
+                router.push({
+                  pathname: `/project/env/${record.id}/config`,
+                  state: this.props.location.state,
+                })
               }}
             >
               配置管理
@@ -116,14 +120,19 @@ class Index extends Component {
             <Divider type="vertical"/>
             <a
               onClick={() => {
-                router.push(`/project/env/${record.id}/webhook`)
+                router.push({
+                  pathname: `/project/env/${record.id}/webhook`,
+                  state: this.props.location.state,
+                })
               }}
             >
               webhook
             </a>
             <Divider type="vertical"/>
-            <a
-              onClick={() => {
+            <Popconfirm
+              title="您确定要备份当前配置吗？"
+              onConfirm={() => {
+
                 const { dispatch } = this.props
                 dispatch({
                   type: 'api/copyProjectEnv',
@@ -131,10 +140,11 @@ class Index extends Component {
                 }).then(() => {
                   this.fetch()
                 })
+
               }}
             >
-              备份
-            </a>
+                 <a>备份</a>
+            </Popconfirm>
             <Divider type="vertical"/>
             <a
               onClick={() => {
@@ -171,24 +181,17 @@ class Index extends Component {
 
     return (
       <div>
-        <div style={{ padding: '20px' }}>
-          <a
-            onClick={() => {
-              router.goBack()
-            }}
-          >
-            <Icon theme="twoTone" type="left-circle"/>&nbsp;
-            返回
-          </a>
-        </div>
+        <Breadcrumb>
+          <Breadcrumb.Item><Link to="/">首页</Link></Breadcrumb.Item>
+          <Breadcrumb.Item>
+            <Link to="/project/index">
+              项目列表{this.props.location.state?.title ? '（' + this.props.location.state.title + '）' : ''}
+            </Link>
+          </Breadcrumb.Item>
+          <Breadcrumb.Item>项目环境</Breadcrumb.Item>
+        </Breadcrumb>
 
-        <div style={{ backgroundColor: 'white', padding: '20px 20px' }}>
-          {/* 标题 */}
-          <div>
-            <Typography.Title level={3} style={{ textAlign: 'center' }}>
-              环境管理
-            </Typography.Title>
-          </div>
+        <div style={{ backgroundColor: 'white', padding: '10px 20px', marginTop: 20 }}>
 
           <div style={{ padding: '20px 0' }}>
             <Row>
@@ -298,7 +301,7 @@ class Index extends Component {
             </Row>
           </div>
           <Table
-            // style={{tableLayout: 'fixed'}}
+            style={{ marginBottom: 20 }}
             dataSource={api.putProjectEnvList}
             rowKey={record => record.id}
             pagination={false}

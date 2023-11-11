@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
-import { Button, Col, Divider, Form, Icon, Input, message, Modal, Row, Spin, Table, Tabs, Typography, } from 'antd'
+import { Breadcrumb, Button, Col, Divider, Form, Icon, Input, message, Modal, Row, Spin, Table, Tabs, } from 'antd'
 import { connect } from 'dva'
-import router from 'umi/router'
 import { UnControlled as CodeMirror } from 'react-codemirror2'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/material.css'
 import 'codemirror/mode/properties/properties'
 import styles from './codemirror.less'
 import { request_post } from '@/utils/request_tool'
+import { Link } from 'umi'
 
 const { confirm } = Modal
 
@@ -169,25 +169,29 @@ class Index extends Component {
         spinning={this.state.webhooking}
       >
         <div>
-          <div style={{ padding: '20px' }}>
-            <a
-              onClick={() => {
-                router.goBack()
+          <Breadcrumb>
+            <Breadcrumb.Item><Link to="/">首页</Link></Breadcrumb.Item>
+            <Breadcrumb.Item>
+              <Link to={{
+                pathname: '/project/index',
+                state: this.props.location.state,
               }}
-            >
-              <Icon theme="twoTone" type="left-circle"/>&nbsp;
-              返回
-            </a>
-          </div>
+              >
+                项目列表{this.props.location.state?.title ? '（' + this.props.location.state.title + '）' : ''}
+              </Link>
+            </Breadcrumb.Item>
+            <Breadcrumb.Item>
+              <Link to={{
+                pathname: '/project/' + this.props.location.state?.project_id + '/env',
+                state: this.props.location.state,
+              }}>
+                项目环境
+              </Link>
+            </Breadcrumb.Item>
+            <Breadcrumb.Item>配置管理</Breadcrumb.Item>
+          </Breadcrumb>
 
-          <div style={{ backgroundColor: 'white', padding: '20px 20px' }}>
-            {/* 标题 */}
-            <div>
-              <Typography.Title level={3} style={{ textAlign: 'center' }}>
-                配置管理
-              </Typography.Title>
-            </div>
-
+          <div style={{ backgroundColor: 'white', padding: '10px 20px', marginTop: 20 }}>
             <Tabs>
               <Tabs.TabPane
                 tab={
