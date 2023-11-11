@@ -6,6 +6,7 @@ use app\common\controller\BaseController;
 use app\common\exception\CommonException;
 use app\common\helper\PageHelper;
 use app\common\model\Project;
+use app\common\model\ProjectEnv;
 use app\common\model\User;
 use think\Request;
 
@@ -35,7 +36,10 @@ class ProjectController extends BaseController
             ->alias('a')
             ->join('user b', 'a.creator_uid=b.id')
             ->where($where)
-            ->field('a.id,a.title,a.code,a.desc,a.create_time,b.title as creator_name,b.appid as creator_appid')
+            ->field([
+                'a.id,a.title,a.code,a.desc,a.create_time,b.title as creator_name,b.appid as creator_appid',
+                '(' . ProjectEnv::alias('b')->whereRaw('a.id=b.project_id')->fetchSql()->value('count(*)') . ') as project_env_count',
+            ])
             ->order('a.id', 'desc')
             ->autoPage()
             ->get();

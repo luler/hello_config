@@ -43,7 +43,11 @@ class ProjectEnvController extends BaseController
             ->join('project b', 'a.project_id=b.id')
             ->where($where)
             ->order('a.code')
-            ->field('a.id,a.code,a.desc,a.create_time,b.title as project_name')
+            ->field([
+                'a.id,a.code,a.desc,a.create_time,b.title as project_name',
+                '(' . ProjectEnvWebhook::alias('b')->whereRaw('a.id=b.project_env_id')->fetchSql()->value('count(*)') . ') as project_env_webhook_count',
+                '(' . ProjectEnvConfig::alias('b')->whereRaw('a.id=b.project_env_id')->fetchSql()->value('count(*)') . ') as project_env_config_count',
+            ])
             ->select();
 
         return $this->successResponse('获取成功', $res);

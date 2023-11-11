@@ -136,7 +136,7 @@ class Index extends Component {
                 })
               }}
             >
-              设置环境
+              设置环境({record.project_env_count})
             </a>
             <Divider type="vertical"/>
             <a

@@ -104,7 +104,7 @@ class Index extends Component {
       {
         title: '操作',
         key: 'action',
-        width: 320,
+        width: 350,
         render: (text, record) => (
           <span>
             <a
@@ -115,7 +115,7 @@ class Index extends Component {
                 })
               }}
             >
-              配置管理
+              配置管理({record.project_env_config_count})
             </a>
             <Divider type="vertical"/>
             <a
@@ -126,7 +126,7 @@ class Index extends Component {
                 })
               }}
             >
-              webhook
+              webhook({record.project_env_webhook_count})
             </a>
             <Divider type="vertical"/>
             <Popconfirm
