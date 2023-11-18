@@ -8,6 +8,11 @@ class InitBehavior
 {
     public function run()
     {
+        self::initJwtSecret();
+    }
+
+    public static function initJwtSecret()
+    {
         //初始化时，自动配置jwt秘钥
         if (!config('jwt.jwt_secret')) {
             $env_path = app()->getRootPath() . '.env';

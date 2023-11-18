@@ -2,6 +2,7 @@
 
 namespace app\common\command;
 
+use app\common\behavior\InitBehavior;
 use app\common\exception\CommonException;
 use app\common\exception\ForbiddenException;
 use app\common\exception\SystemErrorException;
@@ -17,6 +18,11 @@ use think\console\Output;
 
 class SwooleHttpServer extends Command
 {
+    protected function initialize(Input $input, Output $output)
+    {
+        InitBehavior::initJwtSecret();
+    }
+
     protected function configure()
     {
         // 指令配置
